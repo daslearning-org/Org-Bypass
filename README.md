@@ -11,7 +11,9 @@ Your corporate device may track mouse movement or keyboard inputs to track activ
 What if we could automatically send some keyboard inputs to the computer & we do not need to create any script or install any additional software? Yup, that's right, we will be leveraging simple usb keyboard technology with a tiny micro-controller.
 
 ### 📽️ Demo
-Coming soon...
+You can click on the below Image or this [Youtube Link](https://www.youtube.com/watch?v=1WQOeCBd_mk) to see the demo. Please let me know in the comments, how do you feel about this App. <br>
+
+<a href="https://www.youtube.com/watch?v=1WQOeCBd_mk" align="center"><img width="50%" src="./docs/images/OrgBypassThumbYT.jpg" /></a>
 
 ### ⌨ Using ESP32-S3 as a USB Keyboard
 ESP32-S3 natively supports USB OTG and it is perfect for this project. It will act as a USB keyboard which can send automatic inputs from `a-z` every 3 seconds (configurable in code).
