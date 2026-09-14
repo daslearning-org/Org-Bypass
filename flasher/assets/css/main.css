@@ -1,0 +1,115 @@
+/*---- Navbar Section > ----*/
+
+#logo img {
+  padding: 0;
+  margin: 0;
+  max-height: 36px;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #fff;
+  background-color: rgb(42, 40, 93);
+}
+
+.b-example-divider {
+  width: 100%;
+  height: 3rem;
+  background-color: rgba(0, 0, 0, .1);
+  border: solid rgba(0, 0, 0, .15);
+  border-width: 1px 0;
+  box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+}
+
+.b-example-vr {
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 100vh;
+}
+
+.bi {
+  vertical-align: -.125em;
+  fill: currentColor;
+}
+
+.bd-mode-toggle {
+  z-index: 1500;
+}
+
+.btn-toggle {
+  padding: .25rem .5rem;
+  font-weight: 600;
+  color: var(--bs-emphasis-color);
+  background-color: transparent;
+}
+
+.btn-toggle::before {
+  width: 1.25em;
+  line-height: 0;
+  content: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba%280,0,0,.5%29' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 14l6-6-6-6'/%3e%3c/svg%3e");
+  transition: transform .35s ease;
+  transform-origin: .5em 50%;
+}
+
+[data-bs-theme="dark"] .btn-toggle::before {
+  content: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba%28255,255,255,.5%29' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 14l6-6-6-6'/%3e%3c/svg%3e");
+}
+
+.btn-toggle[aria-expanded="true"]::before {
+  transform: rotate(90deg);
+}
+
+.btn-toggle-nav a {
+  padding: .1875rem .5rem;
+  margin-top: .125rem;
+  margin-left: 1.25rem;
+}
+
+/* */
+body {
+  height: 100%;
+}
+
+aside {
+  /* border: 1px yellow solid; */
+  position: fixed;
+  overflow: auto;
+  height: calc(100vh - 68px);
+  justify-content: flex-start;
+  align-self: flex-start;
+}
+
+main {
+  position: relative;
+  overflow: auto;
+  margin-left: auto;
+  justify-content: flex-end;
+  align-self: flex-end;
+}
+
+#sidebarshow {
+  display: none;
+}
+
+textarea { width: 100%; height: 320px; font-family: monospace; font-size: 12px; margin-top: 14px; }
+
+/*
+@media screen and (max-width: 575px) {
+  #sidebarshow {
+    display: inline;
+  }
+  #sidebartoggle {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 769px) {
+  .dropend:hover > .dropdown-menu {
+    position: absolute;
+    top: 0;
+    left: 100%;
+  }
+  .dropend .dropdown-toggle {
+    margin-left: 0.5em;
+  }
+}
+*/
