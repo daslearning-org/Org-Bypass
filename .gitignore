@@ -1,3 +1,6 @@
+# local ignores
+*.bin
+
 # Prerequisites
 *.d
 
