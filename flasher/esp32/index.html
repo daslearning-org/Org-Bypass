@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ESP32-S3 Web Flasher</title>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 24px; max-width: 700px; margin: auto; }
+    button { padding: 10px 18px; margin-right: 8px; font-size: 14px; cursor: pointer; }
+    textarea { width: 100%; height: 320px; font-family: monospace; font-size: 12px; margin-top: 14px; }
+    .status-bar { margin: 12px 0; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>ESP32-S3 Firmware Flasher</h2>
+  
+  <button id="connectBtn">Connect to ESP32-S3</button>
+  <button id="flashMultiBtn" disabled>Flash Separate Binaries</button>
+  <button id="flashMergedBtn" disabled>Flash Merged Binary (0x0)</button>
+
+  <div class="status-bar" id="status">Status: Disconnected</div>
+  <textarea id="log" readonly placeholder="Execution logs will appear here..."></textarea>
+
+  <script type="module">
+    import { ESPLoader, Transport } from "https://unpkg.com/esptool-js@0.5.0/bundle.js";
+
+    let device = null;
+    let transport = null;
+    let esploader = null;
+
+    const connectBtn = document.getElementById("connectBtn");
+    const flashMultiBtn = document.getElementById("flashMultiBtn");
+    const flashMergedBtn = document.getElementById("flashMergedBtn");
+    const statusText = document.getElementById("status");
+    const logArea = document.getElementById("log");
+
+    function log(msg) {
+      logArea.value += msg + "\n";
+      logArea.scrollTop = logArea.scrollHeight;
+    }
+
+    const terminal = {
+      clean() { logArea.value = ""; },
+      writeLine(data) { log(data); },
+      write(data) { log(data); }
+    };
+
+    // Helper to fetch file and convert to binary string array buffer
+    async function loadBin(path) {
+      const response = await fetch(path);
+      if (!response.ok) throw new Error(`Failed to load ${path}: ${response.statusText}`);
+      const buffer = await response.arrayBuffer();
+      // esptool-js expects raw binary string format
+      let binary = "";
+      const bytes = new Uint8Array(buffer);
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return binary;
+    }
+
+    // 1. Connect to ESP32-S3
+    connectBtn.onclick = async () => {
+      try {
+        device = await navigator.serial.requestPort();
+        transport = new Transport(device);
+
+        // Standard connection options
+        esploader = new ESPLoader({
+          transport: transport,
+          baudrate: 115200,      // Communication baud rate
+          terminal: terminal,
+          romBaudrate: 115200
+        });
+
+        statusText.innerText = "Status: Connecting... (Hold BOOT if unresponsive)";
+        const detectedChip = await esploader.main();
+        statusText.innerText = `Status: Connected to ${detectedChip}`;
+        
+        flashMultiBtn.disabled = false;
+        flashMergedBtn.disabled = false;
+        connectBtn.disabled = true;
+      } catch (err) {
+        log(`Connection Error: ${err.message}`);
+        statusText.innerText = "Status: Connection Failed";
+      }
+    };
+
+    // 2. Flash Individual Files at ESP32-S3 Offsets
+    flashMultiBtn.onclick = async () => {
+      try {
+        statusText.innerText = "Status: Downloading binaries...";
+        
+        // Exact 4 files generated in your Arduino S3 build folder
+        const [bootloader, partitions, bootApp0, app] = await Promise.all([
+          loadBin("sketch_may24a.ino.bootloader.bin"),
+          loadBin("sketch_may24a.ino.partitions.bin"),
+          loadBin("boot_app0.bin"),
+          loadBin("sketch_may24a.ino.bin")
+        ]);
+
+        // ESP32-S3 Specific Memory Map
+        const fileArray = [
+          { data: bootloader, address: 0x0000 },
+          { data: partitions, address: 0x8000 },
+          { data: bootApp0,   address: 0xe000 },
+          { data: app,        address: 0x10000 }
+        ];
+
+        statusText.innerText = "Status: Writing to flash...";
+        await esploader.writeFlash({
+          fileArray: fileArray,
+          flashSize: "keep",
+          flashMode: "keep",
+          flashFreq: "keep",
+          eraseAll: false,
+          compress: true,
+          reportProgress: (fileIndex, written, total) => {
+            const percent = Math.round((written / total) * 100);
+            statusText.innerText = `Status: Flashing file ${fileIndex + 1}/4 (${percent}%)`;
+          }
+        });
+
+        statusText.innerText = "Status: Flashing complete! Resetting board...";
+        log("Done! Rebooting chip into user firmware...");
+        // 1. Trigger a hard reset using esptool-js's built-in reset method
+        await esploader.hardReset();
+        // 2. Release the USB serial port locks so the browser or other tools can read serial
+        await transport.disconnect();
+        log("Device reset successfully!");
+      } catch (err) {
+        log(`Flash Error: ${err.message}`);
+        statusText.innerText = "Status: Flash Failed";
+      }
+    };
+
+    // 3. Flash Single Merged Binary (Custom or Arduino 4MB merged.bin)
+    flashMergedBtn.onclick = async () => {
+      try {
+        statusText.innerText = "Status: Downloading merged binary...";
+        const mergedData = await loadBin("sketch_may24a.ino.merged.bin");
+
+        statusText.innerText = "Status: Writing merged image...";
+        await esploader.writeFlash({
+          fileArray: [
+            { data: mergedData, address: 0x0000 }
+          ],
+          flashSize: "keep",
+          flashMode: "keep",
+          flashFreq: "keep",
+          eraseAll: false,
+          compress: true,
+          reportProgress: (fileIndex, written, total) => {
+            const percent = Math.round((written / total) * 100);
+            statusText.innerText = `Status: Flashing merged.bin (${percent}%)`;
+          }
+        });
+
+        statusText.innerText = "Status: Flash complete! Resetting board...";
+        log("Done! Rebooting chip into user firmware...");
+        // 1. Trigger a hard reset using esptool-js's built-in reset method
+        await esploader.hardReset();
+        // 2. Release the USB serial port locks so the browser or other tools can read serial
+        await transport.disconnect();
+        log("Device reset successfully!");
+
+      } catch (err) {
+        log(`Flash Error: ${err.message}`);
+        statusText.innerText = "Status: Flash Failed";
+      }
+    };
+  </script>
+</body>
+</html>
