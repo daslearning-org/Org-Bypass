@@ -1,173 +1,230 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>ESP32-S3 Web Flasher</title>
-  <style>
-    body { font-family: system-ui, sans-serif; padding: 24px; max-width: 700px; margin: auto; }
-    button { padding: 10px 18px; margin-right: 8px; font-size: 14px; cursor: pointer; }
-    textarea { width: 100%; height: 320px; font-family: monospace; font-size: 12px; margin-top: 14px; }
-    .status-bar { margin: 12px 0; font-weight: bold; }
-  </style>
-</head>
-<body>
-  <h2>ESP32-S3 Firmware Flasher</h2>
-  
-  <button id="connectBtn">Connect to ESP32-S3</button>
-  <button id="flashMultiBtn" disabled>Flash Separate Binaries</button>
-  <button id="flashMergedBtn" disabled>Flash Merged Binary (0x0)</button>
 
-  <div class="status-bar" id="status">Status: Disconnected</div>
-  <textarea id="log" readonly placeholder="Execution logs will appear here..."></textarea>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <script type="module">
-    import { ESPLoader, Transport } from "https://unpkg.com/esptool-js@0.5.0/bundle.js";
+    <meta id="metaDesc" name="description" content="Web based microcontroller flasher from DasLearning">
 
-    let device = null;
-    let transport = null;
-    let esploader = null;
+    <meta id="metaKeywords" name="keywords" content="microcontroller flassher, esp32 flasher, web based esp flash">
+    <link id="canonicalHref" rel="canonical" href="https://mc.daslearning.in">
 
-    const connectBtn = document.getElementById("connectBtn");
-    const flashMultiBtn = document.getElementById("flashMultiBtn");
-    const flashMergedBtn = document.getElementById("flashMergedBtn");
-    const statusText = document.getElementById("status");
-    const logArea = document.getElementById("log");
+    <meta property="og:url" content="https://mc.daslearning.in">
+    <meta id="blogTitle" property="og:title" content="About blog-maker app">
+    <meta id="metaOgImg" property="og:image" content="https://mc.daslearning.in/assets/images/logo/ogImage.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:description" content="Web based microcontroller flasher from DasLearning">
 
-    function log(msg) {
-      logArea.value += msg + "\n";
-      logArea.scrollTop = logArea.scrollHeight;
-    }
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/images/logo/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/logo/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/logo/favicon-16x16.png">
+    <link rel="manifest" href="../assets/images/logo/site.webmanifest">
 
-    const terminal = {
-      clean() { logArea.value = ""; },
-      writeLine(data) { log(data); },
-      write(data) { log(data); }
-    };
+    <title>ESP32 Flasher | DasLearning</title>
 
-    // Helper to fetch file and convert to binary string array buffer
-    async function loadBin(path) {
-      const response = await fetch(path);
-      if (!response.ok) throw new Error(`Failed to load ${path}: ${response.statusText}`);
-      const buffer = await response.arrayBuffer();
-      // esptool-js expects raw binary string format
-      let binary = "";
-      const bytes = new Uint8Array(buffer);
-      for (let i = 0; i < bytes.byteLength; i++) {
-        binary += String.fromCharCode(bytes[i]);
-      }
-      return binary;
-    }
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link href="../assets/css/main.css" rel="stylesheet">
+    
+  </head>
 
-    // 1. Connect to ESP32-S3
-    connectBtn.onclick = async () => {
-      try {
-        device = await navigator.serial.requestPort();
-        transport = new Transport(device);
+  <body class="bg-body-tertiary">
 
-        // Standard connection options
-        esploader = new ESPLoader({
-          transport: transport,
-          baudrate: 115200,      // Communication baud rate
-          terminal: terminal,
-          romBaudrate: 115200
-        });
+    <!-- SVG images -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+      <symbol id="check2" viewBox="0 0 16 16">
+        <path
+          d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z" />
+      </symbol>
+      <symbol id="circle-half" viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z" />
+      </symbol>
+      <symbol id="moon-stars-fill" viewBox="0 0 16 16">
+        <path
+          d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z" />
+        <path
+          d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z" />
+      </symbol>
+      <symbol id="sun-fill" viewBox="0 0 16 16">
+        <path
+          d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z" />
+      </symbol>
+    </svg>
 
-        statusText.innerText = "Status: Connecting... (Hold BOOT if unresponsive)";
-        const detectedChip = await esploader.main();
-        statusText.innerText = `Status: Connected to ${detectedChip}`;
+    <!-- Start navbar -->
+    <nav class="navbar sticky-top navbar-expand-lg border-bottom bg-body-tertiary">
+      <div class="container-fluid">
+        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse"
+          data-bs-target="#collapseWidthExample" aria-expanded="true" aria-controls="collapseWidthExample"
+          style="margin-right: 10px; padding: 0px 5px 0px 5px;" id="sidebartoggle" onclick="changeclass()"> <i
+            class="bi bi-list"></i>
+        </button>
+        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasExample" aria-controls="offcanvasExample"
+          style="margin-right: 10px; padding: 2px 6px 2px 6px;" id="sidebarshow">
+          <i class="bi bi-arrow-bar-right"></i>
+        </button>
+        <div id="logo" class="me-auto">
+          <a class="navbar-brand fw-bold" href="/"><img src="../assets/images/logo/logoNavRound.webp" alt="" title=""></a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="true" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page" href="#">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/esp3">ESP32</a>
+            </li>
+          </ul>
+          <!--form class="d-flex" role="search">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+          </form-->
+          <!-- Change theme menu -->
+          <div class="dropdown-center" style="padding-left: 10px;">
+            <button class="btn btn-bd-primary py-2 dropdown-toggle d-flex align-items-center" id="bd-theme" type="button"
+              aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (auto)">
+              <svg class="bi my-1 theme-icon-active" width="1em" height="1em">
+                <use href="#circle-half"></use>
+              </svg>
+              <span class="visually-hidden" id="bd-theme-text">Toggle theme</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="bd-theme-text">
+              <li>
+                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light"
+                  aria-pressed="false">
+                  <svg class="bi me-2 opacity-50 theme-icon" width="1em" height="1em">
+                    <use href="#sun-fill"></use>
+                  </svg>
+                  Light
+                  <svg class="bi ms-auto d-none" width="1em" height="1em">
+                    <use href="#check2"></use>
+                  </svg>
+                </button>
+              </li>
+              <li>
+                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark"
+                  aria-pressed="false">
+                  <svg class="bi me-2 opacity-50 theme-icon" width="1em" height="1em">
+                    <use href="#moon-stars-fill"></use>
+                  </svg>
+                  Dark
+                  <svg class="bi ms-auto d-none" width="1em" height="1em">
+                    <use href="#check2"></use>
+                  </svg>
+                </button>
+              </li>
+              <li>
+                <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto"
+                  aria-pressed="true">
+                  <svg class="bi me-2 opacity-50 theme-icon" width="1em" height="1em">
+                    <use href="#circle-half"></use>
+                  </svg>
+                  Auto
+                  <svg class="bi ms-auto d-none" width="1em" height="1em">
+                    <use href="#check2"></use>
+                  </svg>
+                </button>
+              </li>
+            </ul>
+          </div>
+          <!-- End change theme meny -->
+        </div>
+      </div>
+    </nav>
+    <!-- end navbar -->
+
+    <!-- Aside menu orginal -->
+    <aside class="collapse show collapse-horizontal col-sm-2 p-3 border-end bg-body-tertiary" id="collapseWidthExample">
+      <a href="#!" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+        ESP32 Flasher
+      </a>
+      <hr>
+      <ul class="list-unstyled ps-0">
+        <li class="mb-1">
+          <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
+            data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="false">
+            USB Protocol
+          </button>
+          <div class="collapse" id="home-collapse">
+            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+              <li><a href="/esp32/automatic-keyboard" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Automatic Keyboard</a></li>
+              <!--li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Updates</a></li>
+              <li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Reports</a></li-->
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </aside>
+    <!-- End aside -->
+
+    <main class="col-sm-10 bg-body-tertiary" id="main">
+      <div class="container-fluid">
+        <!-- New graph -->
+        <div class="row">
+            <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">ESP32</li>
+            </ol>
+            </nav>
+            <p>Selective list of ESP32 flashing tools, you may use the left side panel for full list.</p>
+
+            <div class="col-12 col-md-6 col-lg-3 mb-4 mb-lg-0">
+            <div class="card">
+                <h5 class="card-header">ESP32-S3 USB Keyboard</h5>
+                <div class="card-body">
+                <h5 class="card-title">Auto Keyboard Input</h5>
+                <p class="card-text">Turn your ESP32-S3 into automatic keyboard to trick organization time tracking</p>
+                <p class="card-text text-success">Runs as standard USB Keybaord</p>
+                </div>
+            </div>
+            </div>
+
+            <!--div class="col-12 col-md-6 col-lg-3 mb-4 mb-lg-0">
+            <div class="card">
+                <h5 class="card-header">ESP8266</h5>
+                <div class="card-body">
+                <h5 class="card-title">Auto Keyboard Input</h5>
+                <p class="card-text">Turn your ESP32-S3 into automatic keyboard to trick organization time tracking</p>
+                <p class="card-text text-success">Runs as standard USB Keybaord</p>
+                </div>
+            </div>
+            </div-->
+
+        </div>
+
+        <!-- Footer for end section -->
+        <div class="row">
+            <footer class="pt-5 d-flex justify-content-between">
+            <span>Copyright © 2026 <a href="https://daslearning.in">DasLearning</a></span>
+            <ul class="nav m-0">
+                <li class="nav-item">
+                <a class="nav-link text-secondary" href="https://daslearning.in/contact/">Contact</a>
+                </li>
+            </ul>
+            </footer>
+        </div>
+        <!-- End footer -->
+      </div>
+
         
-        flashMultiBtn.disabled = false;
-        flashMergedBtn.disabled = false;
-        connectBtn.disabled = true;
-      } catch (err) {
-        log(`Connection Error: ${err.message}`);
-        statusText.innerText = "Status: Connection Failed";
-      }
-    };
 
-    // 2. Flash Individual Files at ESP32-S3 Offsets
-    flashMultiBtn.onclick = async () => {
-      try {
-        statusText.innerText = "Status: Downloading binaries...";
-        
-        // Exact 4 files generated in your Arduino S3 build folder
-        const [bootloader, partitions, bootApp0, app] = await Promise.all([
-          loadBin("sketch_may24a.ino.bootloader.bin"),
-          loadBin("sketch_may24a.ino.partitions.bin"),
-          loadBin("boot_app0.bin"),
-          loadBin("sketch_may24a.ino.bin")
-        ]);
+    </main>
 
-        // ESP32-S3 Specific Memory Map
-        const fileArray = [
-          { data: bootloader, address: 0x0000 },
-          { data: partitions, address: 0x8000 },
-          { data: bootApp0,   address: 0xe000 },
-          { data: app,        address: 0x10000 }
-        ];
+    <!-- JAVASCRIPT FILES -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js-001/theme.js"></script>
 
-        statusText.innerText = "Status: Writing to flash...";
-        await esploader.writeFlash({
-          fileArray: fileArray,
-          flashSize: "keep",
-          flashMode: "keep",
-          flashFreq: "keep",
-          eraseAll: false,
-          compress: true,
-          reportProgress: (fileIndex, written, total) => {
-            const percent = Math.round((written / total) * 100);
-            statusText.innerText = `Status: Flashing file ${fileIndex + 1}/4 (${percent}%)`;
-          }
-        });
-
-        statusText.innerText = "Status: Flashing complete! Resetting board...";
-        log("Done! Rebooting chip into user firmware...");
-        // 1. Trigger a hard reset using esptool-js's built-in reset method
-        await esploader.hardReset();
-        // 2. Release the USB serial port locks so the browser or other tools can read serial
-        await transport.disconnect();
-        log("Device reset successfully!");
-      } catch (err) {
-        log(`Flash Error: ${err.message}`);
-        statusText.innerText = "Status: Flash Failed";
-      }
-    };
-
-    // 3. Flash Single Merged Binary (Custom or Arduino 4MB merged.bin)
-    flashMergedBtn.onclick = async () => {
-      try {
-        statusText.innerText = "Status: Downloading merged binary...";
-        const mergedData = await loadBin("sketch_may24a.ino.merged.bin");
-
-        statusText.innerText = "Status: Writing merged image...";
-        await esploader.writeFlash({
-          fileArray: [
-            { data: mergedData, address: 0x0000 }
-          ],
-          flashSize: "keep",
-          flashMode: "keep",
-          flashFreq: "keep",
-          eraseAll: false,
-          compress: true,
-          reportProgress: (fileIndex, written, total) => {
-            const percent = Math.round((written / total) * 100);
-            statusText.innerText = `Status: Flashing merged.bin (${percent}%)`;
-          }
-        });
-
-        statusText.innerText = "Status: Flash complete! Resetting board...";
-        log("Done! Rebooting chip into user firmware...");
-        // 1. Trigger a hard reset using esptool-js's built-in reset method
-        await esploader.hardReset();
-        // 2. Release the USB serial port locks so the browser or other tools can read serial
-        await transport.disconnect();
-        log("Device reset successfully!");
-
-      } catch (err) {
-        log(`Flash Error: ${err.message}`);
-        statusText.innerText = "Status: Flash Failed";
-      }
-    };
-  </script>
-</body>
+  </body>
 </html>

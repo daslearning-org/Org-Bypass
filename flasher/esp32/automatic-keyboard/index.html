@@ -17,19 +17,19 @@
     <meta property="og:image:height" content="630">
     <meta property="og:description" content="Web based microcontroller flasher from DasLearning">
 
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/logo/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/logo/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/logo/favicon-16x16.png">
-    <link rel="manifest" href="assets/images/logo/site.webmanifest">
+    <link rel="apple-touch-icon" sizes="180x180" href="../../assets/images/logo/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../../assets/images/logo/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../../assets/images/logo/favicon-16x16.png">
+    <link rel="manifest" href="../../assets/images/logo/site.webmanifest">
 
-    <title>Web Flasher | DasLearning</title>
+    <title>ESP32 Flasher | DasLearning</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <link href="assets/css/main.css" rel="stylesheet">
+    <link href="../../assets/css/main.css" rel="stylesheet">
     
   </head>
 
@@ -56,15 +56,6 @@
       </symbol>
     </svg>
 
-    <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
-      <symbol id="kk" viewBox="0 0 118 94">
-        <title>Bootstrap</title>
-        <path fill-rule="evenodd" clip-rule="evenodd"
-          d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516s1.52.087 2.475-1.258.762-2.391.728-2.43m3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422s1.675-2.789 1.698-2.854-.597-.79-1.254-1.157a3.7 3.7 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116-.508.139-1.653.589-1.968.607-.316.018-1.256-.522-2.267-.665-.647-.125-1.333.131-1.824.328-.49.196-1.422.754-2.074 2.237-.652 1.482-.311 3.83-.067 4.56s.625 1.924 1.273 2.796c.576.984 1.34 1.667 1.659 1.899s1.219.386 1.843.067c.502-.308 1.408-.485 1.766-.472.357.013 1.061.154 1.782.539.571.197 1.111.115 1.652-.105.541-.221 1.324-1.059 2.238-2.758q.52-1.185.473-1.282">
-        </path>
-      </symbol>
-    </svg>
-
     <!-- Start navbar -->
     <nav class="navbar sticky-top navbar-expand-lg border-bottom bg-body-tertiary">
       <div class="container-fluid">
@@ -79,7 +70,7 @@
           <i class="bi bi-arrow-bar-right"></i>
         </button>
         <div id="logo" class="me-auto">
-          <a class="navbar-brand fw-bold" href="/"><img src="assets/images/logo/logoNavRound.webp" alt="" title=""></a>
+          <a class="navbar-brand fw-bold" href="/"><img src="../../assets/images/logo/logoNavRound.webp" alt="" title=""></a>
         </div>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
           aria-controls="navbarSupportedContent" aria-expanded="true" aria-label="Toggle navigation">
@@ -88,10 +79,10 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Home</a>
+              <a class="nav-link" aria-current="page" href="#">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" aria-current="page" href="/esp32">ESP32</a>
+              <a class="nav-link active" aria-current="page" href="/esp3">ESP32</a>
             </li>
           </ul>
           <!--form class="d-flex" role="search">
@@ -155,18 +146,18 @@
     <!-- Aside menu orginal -->
     <aside class="collapse show collapse-horizontal col-sm-2 p-3 border-end bg-body-tertiary" id="collapseWidthExample">
       <a href="#!" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
-        Web Flasher
+        ESP32 Flasher
       </a>
       <hr>
       <ul class="list-unstyled ps-0">
         <li class="mb-1">
           <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
             data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="false">
-            ESP32
+            USB Protocol
           </button>
           <div class="collapse" id="home-collapse">
             <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-              <li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">ESP32 Flasher</a></li>
+              <li><a href="/esp32/automatic-keyboard" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Automatic Keyboard</a></li>
               <!--li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Updates</a></li>
               <li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Reports</a></li-->
             </ul>
@@ -178,60 +169,47 @@
 
     <main class="col-sm-10 bg-body-tertiary" id="main">
       <div class="container-fluid">
-        <!-- New graph -->
-        <div class="row">
+
+        <div>
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active" aria-current="page">Overview</li>
+              <li class="breadcrumb-item"><a href="/">Home</a></li>
+              <li class="breadcrumb-item"><a href="/esp32">ESP32</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Automatic Keyboard</li>
             </ol>
           </nav>
-          <p>List of selected flashing tools for different microcontroller boards.</p>
 
-          <div class="col-12 col-md-6 col-lg-3 mb-4 mb-lg-0">
-            <div class="card">
-              <h5 class="card-header">ESP32-S3 USB Keyboard</h5>
-              <div class="card-body">
-                <h5 class="card-title">Auto Keyboard Input</h5>
-                <p class="card-text">Turn your ESP32-S3 into automatic keyboard to trick organization time tracking</p>
-                <p class="card-text text-success">Runs as standard USB Keybaord</p>
-              </div>
-            </div>
-          </div>
-
-          <!--div class="col-12 col-md-6 col-lg-3 mb-4 mb-lg-0">
-            <div class="card">
-              <h5 class="card-header">ESP8266</h5>
-              <div class="card-body">
-                <h5 class="card-title">Auto Keyboard Input</h5>
-                <p class="card-text">Turn your ESP32-S3 into automatic keyboard to trick organization time tracking</p>
-                <p class="card-text text-success">Runs as standard USB Keybaord</p>
-              </div>
-            </div>
-          </div-->
-
+          <h2>ESP32-S3 Firmware Flasher</h2>
+          <button class="btn btn-primary" id="connectBtn">Connect to ESP32-S3</button>
+          <button class="btn btn-secondary" id="flashMultiBtn" disabled>Flash Separate Binaries</button>
+          <button class="btn btn-secondary" id="flashMergedBtn" disabled>Flash Merged Binary (0x0)</button>
+          <div class="status-bar" id="status">Status: Disconnected</div>
+          <textarea id="log" readonly placeholder="Execution logs will appear here..."></textarea>
         </div>
 
         <!-- Footer for end section -->
         <div class="row">
-          <footer class="pt-5 d-flex justify-content-between">
+            <footer class="pt-5 d-flex justify-content-between">
             <span>Copyright © 2026 <a href="https://daslearning.in">DasLearning</a></span>
             <ul class="nav m-0">
-              <li class="nav-item">
+                <li class="nav-item">
                 <a class="nav-link text-secondary" href="https://daslearning.in/contact/">Contact</a>
-              </li>
+                </li>
             </ul>
-          </footer>
+            </footer>
         </div>
         <!-- End footer -->
       </div>
+
+        
 
     </main>
 
     <!-- JAVASCRIPT FILES -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js-001/theme.js"></script>
+    <script src="../../assets/js-001/theme.js"></script>
+    <script type="module" src="../../assets/js-001/esp32/auto-keyboard.js"></script>
 
   </body>
 </html>
