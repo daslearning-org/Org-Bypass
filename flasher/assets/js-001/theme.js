@@ -16,7 +16,7 @@ function changeclass() {
  * Licensed under the Creative Commons Attribution 3.0 Unported License.
  */
 
-(() => {
+document.addEventListener('DOMContentLoaded', () => {
   'use strict'
 
   const getStoredTheme = () => localStorage.getItem('theme')
@@ -51,6 +51,7 @@ function changeclass() {
     const themeSwitcherText = document.querySelector('#bd-theme-text')
     const activeThemeIcon = document.querySelector('.theme-icon-active use')
     const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
+    console.log('btnToActive:', btnToActive)
     const svgOfActiveBtn = btnToActive.querySelector('svg use').getAttribute('href')
 
     document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
@@ -89,4 +90,4 @@ function changeclass() {
         })
       })
   })
-})()
+});

@@ -24,12 +24,7 @@ const terminal = {
 
 // Helper to fetch file and convert to binary string array buffer
 async function loadBin(path) {
-  const response = await fetch(path, {
-    headers: {
-      "Accept": "application/octet-stream",
-      "Access-Control-Allow-Origin": "*"
-    }
-  });
+  const response = await fetch(`https://proxy.corsfix.com/?${path}`);
   if (!response.ok) throw new Error(`Failed to load ${path}: ${response.statusText}`);
   const buffer = await response.arrayBuffer();
   console.log("downloaded bytes:", buffer.byteLength);
@@ -90,7 +85,7 @@ async function getGitReleaseLink(bin_list){
       for(let asset in data["assets"]){
         if(bin_item === data["assets"][asset]["name"]){
           //console.log(bin_item, data["assets"][asset]["url"]);
-          bin_list[bin_item] = data["assets"][asset]["url"];
+          bin_list[bin_item] = data["assets"][asset]["browser_download_url"];
         }
       }
     }
