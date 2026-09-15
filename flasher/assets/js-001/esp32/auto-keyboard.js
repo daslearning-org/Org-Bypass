@@ -24,7 +24,7 @@ const terminal = {
 
 // Helper to fetch file and convert to binary string array buffer
 async function loadBin(path) {
-  const response = await fetch(`https://proxy.corsfix.com/?${path}`);
+  const response = await fetch(path);
   if (!response.ok) throw new Error(`Failed to load ${path}: ${response.statusText}`);
   const buffer = await response.arrayBuffer();
   console.log("downloaded bytes:", buffer.byteLength);
@@ -108,14 +108,13 @@ flashMultiBtn.onclick = async () => {
       "esp32s3_auto_key_boot_app0.bin": "",
       "esp32s3_auto_key.ino.bin": ""
     }
-    let git_assets = await getGitReleaseLink(bin_list);
-    console.log(git_assets);
+    //let git_assets = await getGitReleaseLink(bin_list);
     // Exact 4 files generated in your Arduino S3 build folder
     const [bootloader, partitions, bootApp0, app] = await Promise.all([
-      loadBin(git_assets["esp32s3_auto_key.ino.bootloader.bin"]),
-      loadBin(git_assets["esp32s3_auto_key.ino.partitions.bin"]),
-      loadBin(git_assets["esp32s3_auto_key_boot_app0.bin"]),
-      loadBin(git_assets["esp32s3_auto_key.ino.bin"])
+      loadBin("esp32s3_auto_key.ino.bootloader.bin"),
+      loadBin("esp32s3_auto_key.ino.partitions.bin"),
+      loadBin("esp32s3_auto_key_boot_app0.bin"),
+      loadBin("esp32s3_auto_key.ino.bin")
     ]);
     // ESP32-S3 Specific Memory Map
     const fileArray = [
@@ -157,10 +156,9 @@ flashMergedBtn.onclick = async () => {
     let bin_list = {
       "esp32s3_auto_key.ino.merged.bin": ""
     }
-    let git_assets = await getGitReleaseLink(bin_list);
-    console.log(git_assets);
+    //let git_assets = await getGitReleaseLink(bin_list);
     statusText.innerText = "Status: Downloading merged binary...";
-    const mergedData = await loadBin(git_assets["esp32s3_auto_key.ino.merged.bin"]);
+    const mergedData = await loadBin("esp32s3_auto_key.ino.merged.bin");
     statusText.innerText = "Status: Writing merged image...";
     await esploader.writeFlash({
       fileArray: [
