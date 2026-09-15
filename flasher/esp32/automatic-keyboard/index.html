@@ -60,7 +60,7 @@
     <nav class="navbar sticky-top navbar-expand-lg border-bottom bg-body-tertiary">
       <div class="container-fluid">
         <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse"
-          data-bs-target="#collapseWidthExample" aria-expanded="true" aria-controls="collapseWidthExample"
+          data-bs-target="#aSideBar" aria-expanded="true" aria-controls="aSideBar"
           style="margin-right: 10px; padding: 0px 5px 0px 5px;" id="sidebartoggle" onclick="changeclass()"> <i
             class="bi bi-list"></i>
         </button>
@@ -144,7 +144,7 @@
     <!-- end navbar -->
 
     <!-- Aside menu orginal -->
-    <aside class="collapse show collapse-horizontal col-sm-2 p-3 border-end bg-body-tertiary" id="collapseWidthExample">
+    <aside class="collapse show collapse-horizontal col-sm-2 p-3 border-end bg-body-tertiary" id="aSideBar">
       <a href="#!" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
         ESP32 Flasher
       </a>
@@ -205,10 +205,23 @@
 
     </main>
 
+    <!-- offcanvas - heres is a copy of aside and must be the same, probably fixing later to not duplicate -->
+    <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasExample"
+      aria-labelledby="offcanvasExampleLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasExampleLabel">Go To</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div id="offcanvasBody" class="offcanvas-body">
+        <!-- The content from sidebar will be added into offcanvas from js -->
+      </div>
+    </div>
+    <!-- End offcanvas -->
+
     <!-- JAVASCRIPT FILES -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../../assets/js-001/theme.js"></script>
+    <script src="../../assets/js-002/theme.js"></script>
     <script type="module" src="../../assets/js-001/esp32/auto-keyboard.js"></script>
 
   </body>
