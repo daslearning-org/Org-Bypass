@@ -19,6 +19,9 @@ function changeclass() {
 document.addEventListener('DOMContentLoaded', () => {
   'use strict'
 
+  // Copy all children from aside to offcanvas
+  $('#offcanvasBody').append($('#aSideBar').children().clone());
+
   const getStoredTheme = () => localStorage.getItem('theme')
   const setStoredTheme = theme => localStorage.setItem('theme', theme)
 
