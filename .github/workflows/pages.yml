@@ -31,6 +31,12 @@ jobs:
         id: 'git-checkout'
         uses: "actions/checkout@v4"
 
+      - name: Download bin files
+        id: 'bin-download'
+        run: |
+          cd ./automation/flasher
+          python downloadBinFiles.py
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
