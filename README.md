@@ -24,6 +24,19 @@ ESP32-S3 natively supports USB OTG and it is perfect for this project. It will a
 
 #### 🧩 Steps
 
+##### Using the web flasher (Easy)
+
+* Go to this [web flasher](https://mc.daslearning.in/esp32/automatic-keyboard/) using any Chromium based browser like Chrome, Edge, Brave etc on you computer. <br>
+<a href="https://mc.daslearning.in/esp32/automatic-keyboard/"><img src="./flasher/assets/images/icons/usb-memory.svg" width="50"></a>
+
+* Connect your ESP32-S3 with a USB cable. If you don't see your serial device, you can press & hold `Boot` button on ESP32, then press the `Reset` button and release both. Try to connect again.
+
+* After successful conenction, just press the `Flash` button from the web.
+
+* Once flashing is successful you can remove the USB cable & use the automatic keyboard anywhere.
+
+##### Using Arduni IDE (Manual)
+
 * Install ESP32 on Arduino IDE. You can follow this simple [guide](https://randomnerdtutorials.com/installing-the-esp32-board-in-arduino-ide-windows-instructions/).
 
 * Select your ESP32-S3 board in `Tools` > `Board`. Generally is should be `ESP32S3 Dev Module`.
