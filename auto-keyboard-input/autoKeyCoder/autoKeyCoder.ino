@@ -22,17 +22,14 @@
 /* Global vars / objects */
 bool codeMode = false;
 bool codeStarted = false;
+bool autoMode = false;
+unsigned long timeCounter = 0;
 String gitLink = "";
 USBHIDKeyboard Keyboard;
 // Create WebServer object on port 80
 WebServer server(80);
 
 /* Functions */
-
-void initWebSocket() {
-  ws.onEvent(onEvent);
-  server.addHandler(&ws);
-}
 
 void startAP() {
     Serial.println("Starting AP mode...");
@@ -71,6 +68,80 @@ bool connectWiFi(const String &ssid, const String &password) {
 
     Serial.println("WiFi connection failed");
     return false;
+}
+
+void stopAutoMode() {
+    // Check that a request body was actually received
+    if (!server.hasArg("plain")) {
+        server.send(400, "application/json",
+                    "{\"error\":\"Missing request body\"}");
+        return;
+    }
+
+    String body = server.arg("plain");
+
+    Serial.println("Received:");
+    Serial.println(body);
+
+    // Parse JSON
+    JSONVar json = JSON.parse(body);
+
+    if (JSON.typeof(json) == "undefined") {
+        server.send(400, "application/json",
+                    "{\"error\":\"Invalid JSON\"}");
+        return;
+    }
+
+    // Check required fields
+    if (!json.hasOwnProperty("stop")) {
+        server.send(400, "application/json",
+                    "{\"error\":\"Missing required argument\"}");
+        return;
+    }
+
+    autoMode = false;
+    Serial.println("Stopped auto mode");
+
+    server.send(200, "application/json",
+                "{\"success\":true}");
+
+}
+
+void startAutoMode() {
+    // Check that a request body was actually received
+    if (!server.hasArg("plain")) {
+        server.send(400, "application/json",
+                    "{\"error\":\"Missing request body\"}");
+        return;
+    }
+
+    String body = server.arg("plain");
+
+    Serial.println("Received:");
+    Serial.println(body);
+
+    // Parse JSON
+    JSONVar json = JSON.parse(body);
+
+    if (JSON.typeof(json) == "undefined") {
+        server.send(400, "application/json",
+                    "{\"error\":\"Invalid JSON\"}");
+        return;
+    }
+
+    // Check required fields
+    if (!json.hasOwnProperty("start")) {
+        server.send(400, "application/json",
+                    "{\"error\":\"Missing required arg.\"}");
+        return;
+    }
+
+    autoMode = true;
+    Serial.println("Started auto mode");
+
+    server.send(200, "application/json",
+                "{\"success\":true}");
+
 }
 
 void startCoder() {
@@ -177,7 +248,7 @@ void handleNotFound() {
 }
 
 bool loadConfig(String &ssid, String &password) {
-    File file = LittleFS.open("/config.json", "r");
+    File file = LittleFS.open(CONFIG_FILE, "r");
 
     if (!file) {
         return false;
@@ -246,54 +317,60 @@ void readGitHubFile() {
 void setup() {
     Serial.begin(115200);
 
-    if (!LittleFS.begin(true)) {
-        startAP();
-        return;
-    }
-
-    String ssid;
-    String password;
-
-    if (!loadConfig(ssid, password)) {
-        startAP();
-        return;
-    }
-
-    if (!connectWiFi(ssid, password)) {
-        startAP();
-        return;
-    }
-
-    // Route for root / web page
-    /*
-    server.on("/", HTTP_GET, []() {
-      server.send(LittleFS, "/index.html", "text/html");
-    });
-    */
-    server.serveStatic("/", LittleFS, "/");
-    server.on("/config", HTTP_POST, saveConfig);
-    server.on("/coder", HTTP_POST, startCoder);
-    server.begin();
-    Serial.println("Configuration server started");
-
     USB.manufacturerName("DasLearning");
     USB.productName("USB Keyboard");
     USB.serialNumber("USBKB0092");
-    USB.begin();
     Keyboard.begin();
+    USB.begin();
+    delay(1000); // One second delay at startup
     Serial.println("USB keyboard started");
+
+    if (!LittleFS.begin(true)) {
+        startAP();
+    }
+    else{
+        String ssid;
+        String password;
+
+        if (!loadConfig(ssid, password)) {
+            startAP();
+        }
+        else{
+            if (!connectWiFi(ssid, password)) {
+                startAP();
+            }
+        }
+    }
+
+    // Route for root / web page
+    server.on("/", HTTP_GET, []() {
+        File file = LittleFS.open("/index.html", "r");
+        if (!file) {
+            server.send(404, "text/plain", "index.html not found");
+            return;
+        }
+        server.streamFile(file, "text/html");
+        file.close();
+    });
+    server.serveStatic("/", LittleFS, "/");
+    server.on("/config", HTTP_POST, saveConfig);
+    server.on("/coder", HTTP_POST, startCoder);
+    server.on("/start", HTTP_POST, startAutoMode);
+    server.on("/stop", HTTP_POST, stopAutoMode);
+    server.begin();
+    Serial.println("Configuration server started");
 
 }
 
 void loop() {
-    if(codeMode) {
+    if(codeMode && autoMode) {
         if(!codeStarted && gitLink != ""){
             readGitHubFile();
         }
     }
-    else {
-        static unsigned long timeCounter = 0;
+    else if(autoMode) {
         if (millis() - timeCounter > 3000) { // every 3 seconds
+            //Serial.println("Not in coder mode");
             timeCounter = millis();
             char randomChar = 'a' + random(26);
             Keyboard.print(randomChar);
@@ -303,4 +380,3 @@ void loop() {
     // Handle server inputs
     server.handleClient();
 }
-
