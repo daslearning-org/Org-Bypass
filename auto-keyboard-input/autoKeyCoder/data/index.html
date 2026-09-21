@@ -1,1 +1,44 @@
-<h2>Hello from ESP32</h2>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Smart Keyboard using ESP32</title>
+    <link rel="stylesheet" href="w3.css">
+    <link rel="stylesheet" href="my.css">
+  </head>
+
+  <body>
+
+    <div class="w3-container w3-padding">
+      <h3>Your automatic keyboard to bypass time tracking</h3>
+
+      <div class="w3-container w3-margin-bottom">
+        <button class="w3-btn w3-green w3-round-large w3-margin-top">Start Auto Mode</button>
+      </div>
+
+      <div class="w3-container w3-margin-top">
+        <h4>Automatic Coder mode</h6>
+        <form class="">
+          <label class=""><b>GitHub Code Link (RAW)</b></label>
+          <input class="w3-input w3-border w3-round" type="text" placeholder="https://raw.githubusercontent.com/daslearning-org/Org-Bypass/refs/heads/main/auto-keyboard-input/autoUsbKeyInpEsp32.ino">
+        
+          <button class="w3-btn w3-teal w3-round-large w3-margin-top">Register</button>
+        </form>
+      </div>
+
+      <div class="w3-display-bottomright">
+        <button class="w3-button w3-black" onclick="darkMode()">Dark Mode</button>
+      </div>
+
+      <script>
+        function darkMode() {
+          document.body.classList.toggle("w3-black");
+        }
+      </script>
+
+    </div>
+
+  </body>
+
+</html>
