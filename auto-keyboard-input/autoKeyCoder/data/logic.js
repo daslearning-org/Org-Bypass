@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(autoMode){
       let data = await postMethod("stop", {"stop": "ok"});
       if(data){
-        autoModeBtn.className.replace("w3-orange", "w3-green");
+        autoModeBtn.classList.replace("w3-orange", "w3-green");
         autoModeBtn.textContent = "Start Auto Mode";
         autoMode = false;
       }
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     else{
       let data = await postMethod("start", {"start": "on"});
       if(data){
-        autoModeBtn.className.replace("w3-green", "w3-orange");
+        autoModeBtn.classList.replace("w3-green", "w3-orange");
         autoModeBtn.textContent = "Stop Auto Mode";
         autoMode = true;
       }
@@ -64,6 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
       let data = await postMethod("coder", {"git": gitLinkTxt});
       if(data){
         codeModeBtn.classList.remove("w3-hide");
+        codeModeBtn.classList.replace("w3-green", "w3-orange");
+        codeModeBtn.textContent = "Stop Code Mode";
         alert("Code link sent to your ESP32 keybaord ✅️")
       }
     }
@@ -101,6 +103,7 @@ async function getMethod(path) {
     }
 
     const statData = await response.json();
+    console.log("Stat: ", statData);
     if(statData){
       if(statData["auto"]){
         autoMode = true;
@@ -113,27 +116,26 @@ async function getMethod(path) {
       }
     }
     if(autoMode){
-      autoModeBtn.className.replace("w3-green", "w3-orange");
+      autoModeBtn.classList.replace("w3-green", "w3-orange");
       autoModeBtn.textContent = "Stop Auto Mode";
     }
   
     if(codeMode){
       codeModeBtn.classList.remove("w3-hide");
-      codeModeBtn.className.replace("w3-green", "w3-orange");
+      codeModeBtn.classList.replace("w3-green", "w3-orange");
       codeModeBtn.textContent = "Stop Code Mode";
     }
   
     if(wifiOk){
       wifiSetupDiv.classList.add("w3-hide");
       gitCodeDiv.classList.remove("w3-hide");
-      codeModeBtn.classList.remove("w3-hide");
     }
     else{
       wifiSetupDiv.classList.remove("w3-hide");
       gitCodeDiv.classList.add("w3-hide");
     }
 
-    return data; // Returns the data (resolves the promise)
+    return statData; // Returns the data (resolves the promise)
   }
   catch (error) {
     console.error('Fetch error:', error);
