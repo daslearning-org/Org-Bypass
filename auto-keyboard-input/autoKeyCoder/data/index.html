@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Smart Keyboard using ESP32</title>
     <link rel="stylesheet" href="w3.css">
-    <link rel="stylesheet" href="my.css">
   </head>
 
   <body>
@@ -17,16 +16,18 @@
 
         <div class="w3-margin-bottom">
           <button id="autoModeBtn" class="w3-btn w3-green w3-round-large w3-margin-top">Start Auto Mode</button>
+          <button id="codeModeBtn" class="w3-btn w3-green w3-round-large w3-margin-top w3-hide">Start Code Mode</button>
         </div>
 
         <div id="wifiSetupDiv" class="w3-margin-top">
           <h4>Enter your WiFi credentials to start coder mode</h6>
+          <p>You need to reboot your ESP32, once wifi credentials are saved (unplug and plug)</p>
           <form class="">
             <label class=""><b>SSID (WiFi Name)</b></label>
             <input id="ssidInp" class="w3-input w3-border w3-round" type="text" placeholder="ex: YourWiFiName">
             <label class=""><b>Password</b></label>
             <input id="wifiPswdInp" class="w3-input w3-border w3-round" type="text" placeholder="ex: wifi-password">
-            <button id="wifiSetBtn" type="button" class="w3-btn w3-teal w3-round-large w3-margin-top">Register</button>
+            <button id="wifiSetBtn" type="button" class="w3-btn w3-teal w3-round-large w3-margin-top">Save Config</button>
           </form>
         </div>
 
@@ -36,7 +37,7 @@
             <label class=""><b>GitHub Code Link (RAW)</b></label>
             <input id="gitLinkInp" class="w3-input w3-border w3-round" type="text" placeholder="ex: https://raw.githubusercontent.com/daslearning-org/Org-Bypass/refs/heads/main/auto-keyboard-input/autoUsbKeyInpEsp32.ino">
           
-            <button id="gitLinkBtn" type="button" class="w3-btn w3-teal w3-round-large w3-margin-top">Register</button>
+            <button id="gitLinkBtn" type="button" class="w3-btn w3-teal w3-round-large w3-margin-top">Set Code</button>
           </form>
         </div>
 

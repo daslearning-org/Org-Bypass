@@ -23,6 +23,7 @@
 bool codeMode = false;
 bool codeStarted = false;
 bool autoMode = false;
+bool wifiConnected = false;
 unsigned long timeCounter = 0;
 String gitLink = "";
 USBHIDKeyboard Keyboard;
@@ -63,6 +64,7 @@ bool connectWiFi(const String &ssid, const String &password) {
         Serial.println("WiFi connected!");
         Serial.print("IP: ");
         Serial.println(WiFi.localIP());
+        wifiConnected = true;
         return true;
     }
 
@@ -70,7 +72,7 @@ bool connectWiFi(const String &ssid, const String &password) {
     return false;
 }
 
-void stopAutoMode() {
+void postMethod(String* urlPath) {
     // Check that a request body was actually received
     if (!server.hasArg("plain")) {
         server.send(400, "application/json",
@@ -92,21 +94,87 @@ void stopAutoMode() {
         return;
     }
 
-    // Check required fields
-    if (!json.hasOwnProperty("stop")) {
-        server.send(400, "application/json",
-                    "{\"error\":\"Missing required argument\"}");
-        return;
+    switch (urlPath) {
+        case "stop":
+            /* code */
+            // Check required fields
+            if (!json.hasOwnProperty("stop")) {
+                server.send(400, "application/json",
+                            "{\"error\":\"Missing required argument\"}");
+                return;
+            }
+
+            autoMode = false;
+            Serial.println("Stopped auto mode");
+
+            server.send(200, "application/json",
+                        "{\"success\":true}");
+            break;
+
+        case "start":
+            // Check required fields
+            if (!json.hasOwnProperty("start")) {
+                server.send(400, "application/json",
+                            "{\"error\":\"Missing required arg.\"}");
+                return;
+            }
+        
+            autoMode = true;
+            Serial.println("Started auto mode");
+        
+            server.send(200, "application/json",
+                        "{\"success\":true}");
+            break;
+
+        case "coder":
+            // Check required fields
+            if (!json.hasOwnProperty("git")) {
+                server.send(400, "application/json",
+                            "{\"error\":\"Missing github link\"}");
+                return;
+            }
+
+            gitLink = (const char *)json["git"];
+            codeMode = true;
+            Serial.println("Coder mode started");
+        
+            server.send(200, "application/json",
+                        "{\"success\":true}");
+            break;
+
+        case "config":
+            // Check required fields
+            if (!json.hasOwnProperty("ssid") ||
+                !json.hasOwnProperty("password")) {
+                
+                server.send(400, "application/json",
+                            "{\"error\":\"Missing ssid or password\"}");
+                return;
+            }
+        
+            // Open file for writing
+            File file = LittleFS.open(CONFIG_FILE, "w");
+            if (!file) {
+                Serial.println("Failed to open config file");
+            
+                server.send(500, "application/json",
+                            "{\"error\":\"Failed to save configuration\"}");
+                return;
+            }
+            file.print(body);
+            file.close();
+        
+            server.send(200, "application/json",
+                        "{\"success\":true}");
+            break;
+
+        default:
+            break;
     }
-
-    autoMode = false;
-    Serial.println("Stopped auto mode");
-
-    server.send(200, "application/json",
-                "{\"success\":true}");
 
 }
 
+/*
 void startAutoMode() {
     // Check that a request body was actually received
     if (!server.hasArg("plain")) {
@@ -205,8 +273,7 @@ void saveConfig() {
     }
 
     // Check required fields
-    if (!json.hasOwnProperty("ssid") ||
-        !json.hasOwnProperty("password")) {
+    if (!json.hasOwnProperty("ssid") || !json.hasOwnProperty("password")) {
 
         server.send(400, "application/json",
                     "{\"error\":\"Missing ssid or password\"}");
@@ -229,23 +296,17 @@ void saveConfig() {
 
     Serial.println("Configuration saved");
 
-    /*
     String ssid = (const char *)json["ssid"];
     String password = (const char *)json["password"];
 
     Serial.println("SSID: " + ssid);
     Serial.println("Password: " + password); // to be removed on prod
-    */
 
     server.send(200, "application/json",
                 "{\"success\":true}");
 
 }
-
-void handleNotFound() {
-    server.send(404, "application/json",
-                "{\"error\":\"Not found\"}");
-}
+*/
 
 bool loadConfig(String &ssid, String &password) {
     File file = LittleFS.open(CONFIG_FILE, "r");
@@ -352,20 +413,43 @@ void setup() {
         server.streamFile(file, "text/html");
         file.close();
     });
+    server.on("/status", HTTP_GET, []() {
+        String stat = "{\"auto\":" 
+                        + String(autoMode ? "true" : "false")
+                        + ", \"wifi\":"
+                        + String(wifiConnected ? "true" : "false")
+                        + ", \"code\":"
+                        + String(codeMode ? "true" : "false")
+                        + "}";
+        server.send(200, "application/json", stat);
+    });
     server.serveStatic("/", LittleFS, "/");
-    server.on("/config", HTTP_POST, saveConfig);
-    server.on("/coder", HTTP_POST, startCoder);
-    server.on("/start", HTTP_POST, startAutoMode);
-    server.on("/stop", HTTP_POST, stopAutoMode);
+    server.on("/config", HTTP_POST, [](){
+        postMethod("config");
+    });
+    server.on("/coder", HTTP_POST, [](){
+        postMethod("coder");
+    });
+    server.on("/start", HTTP_POST, [](){
+        postMethod("start");
+    });
+    server.on("/stop", HTTP_POST, [](){
+        postMethod("stop");
+    });
     server.begin();
-    Serial.println("Configuration server started");
+    Serial.println("Web server started");
 
 }
 
 void loop() {
     if(codeMode && autoMode) {
-        if(!codeStarted && gitLink != ""){
-            readGitHubFile();
+        if(gitLink != "" or gitLink != "none"){
+            if(!codeStarted){
+                readGitHubFile();
+            }
+        }
+        else{
+            codeMode = false;
         }
     }
     else if(autoMode) {
