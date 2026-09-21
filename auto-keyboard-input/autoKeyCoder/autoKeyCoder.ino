@@ -20,6 +20,13 @@
 #define CONFIG_FILE "/config.json"
 
 /* Global vars / objects */
+enum PostData {
+    POST_START,
+    POST_STOP,
+    POST_CODER,
+    POST_CONFIG,
+    POST_UNKNOWN
+};
 bool codeMode = false;
 bool codeStarted = false;
 bool autoMode = false;
@@ -31,6 +38,14 @@ USBHIDKeyboard Keyboard;
 WebServer server(80);
 
 /* Functions */
+PostData getPostMode(String path) {
+    if (path == "start")  return POST_START;
+    if (path == "stop")   return POST_STOP;
+    if (path == "config") return POST_CODER;
+    if (path == "coder")  return POST_CONFIG;
+
+    return POST_UNKNOWN;
+}
 
 void startAP() {
     Serial.println("Starting AP mode...");
@@ -72,7 +87,7 @@ bool connectWiFi(const String &ssid, const String &password) {
     return false;
 }
 
-void postMethod(String* urlPath) {
+void postMethod(String urlPath) {
     // Check that a request body was actually received
     if (!server.hasArg("plain")) {
         server.send(400, "application/json",
@@ -94,82 +109,64 @@ void postMethod(String* urlPath) {
         return;
     }
 
-    switch (urlPath) {
-        case "stop":
-            /* code */
-            // Check required fields
-            if (!json.hasOwnProperty("stop")) {
-                server.send(400, "application/json",
-                            "{\"error\":\"Missing required argument\"}");
-                return;
-            }
-
-            autoMode = false;
-            Serial.println("Stopped auto mode");
-
-            server.send(200, "application/json",
-                        "{\"success\":true}");
-            break;
-
-        case "start":
-            // Check required fields
-            if (!json.hasOwnProperty("start")) {
-                server.send(400, "application/json",
-                            "{\"error\":\"Missing required arg.\"}");
-                return;
-            }
+    if(urlPath == "stop") {
+        // Check required fields
+        if (!json.hasOwnProperty("stop")) {
+            server.send(400, "application/json",
+                        "{\"error\":\"Missing required argument\"}");
+            return;
+        }
+        autoMode = false;
+        Serial.println("Stopped auto mode");
+        server.send(200, "application/json",
+                    "{\"success\":true}");
+    }
+    else if(urlPath == "start") {
+        // Check required fields
+        if (!json.hasOwnProperty("start")) {
+            server.send(400, "application/json",
+                        "{\"error\":\"Missing required arg.\"}");
+            return;
+        }
+        autoMode = true;
+        Serial.println("Started auto mode");
+        server.send(200, "application/json",
+                    "{\"success\":true}");
+    }
+    else if(urlPath == "coder") {
+        // Check required fields
+        if (!json.hasOwnProperty("git")) {
+            server.send(400, "application/json",
+                        "{\"error\":\"Missing github link\"}");
+            return;
+        }
+        gitLink = (const char *)json["git"];
+        codeMode = true;
+        Serial.println("Coder mode started");
+        server.send(200, "application/json",
+                    "{\"success\":true}");
+    }
+    else if(urlPath == "config") {
+        // Check required fields
+        if (!json.hasOwnProperty("ssid") ||
+            !json.hasOwnProperty("password")) {
+            server.send(400, "application/json",
+                        "{\"error\":\"Missing ssid or password\"}");
+            return;
+        }
+        // Open file for writing
+        File file = LittleFS.open(CONFIG_FILE, "w");
+        if (!file) {
+            Serial.println("Failed to open config file");
         
-            autoMode = true;
-            Serial.println("Started auto mode");
-        
-            server.send(200, "application/json",
-                        "{\"success\":true}");
-            break;
-
-        case "coder":
-            // Check required fields
-            if (!json.hasOwnProperty("git")) {
-                server.send(400, "application/json",
-                            "{\"error\":\"Missing github link\"}");
-                return;
-            }
-
-            gitLink = (const char *)json["git"];
-            codeMode = true;
-            Serial.println("Coder mode started");
-        
-            server.send(200, "application/json",
-                        "{\"success\":true}");
-            break;
-
-        case "config":
-            // Check required fields
-            if (!json.hasOwnProperty("ssid") ||
-                !json.hasOwnProperty("password")) {
-                
-                server.send(400, "application/json",
-                            "{\"error\":\"Missing ssid or password\"}");
-                return;
-            }
-        
-            // Open file for writing
-            File file = LittleFS.open(CONFIG_FILE, "w");
-            if (!file) {
-                Serial.println("Failed to open config file");
-            
-                server.send(500, "application/json",
-                            "{\"error\":\"Failed to save configuration\"}");
-                return;
-            }
-            file.print(body);
-            file.close();
-        
-            server.send(200, "application/json",
-                        "{\"success\":true}");
-            break;
-
-        default:
-            break;
+            server.send(500, "application/json",
+                        "{\"error\":\"Failed to save configuration\"}");
+            return;
+        }
+        file.print(body);
+        file.close();
+        server.send(200, "application/json",
+                    "{\"success\":true}");
     }
 
 }

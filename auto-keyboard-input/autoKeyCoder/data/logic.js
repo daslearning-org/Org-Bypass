@@ -45,8 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   wifiSetBtn.addEventListener("click", async function(event) {
-    let ssidTxt = ssidInp.textContent.trim();
-    let wifiPassTxt = wifiPswdInp.textContent.trim();
+    let ssidTxt = ssidInp.value.trim();
+    let wifiPassTxt = wifiPswdInp.value.trim();
     if(ssidTxt.length<=2 || wifiPassTxt.length<=2){
       alert("Carefully enter wifi name (ssid) & password");
       return;
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   gitLinkBtn.addEventListener("click", async function(event) {
-    let gitLinkTxt = gitLinkInp.textContent.trim();
+    let gitLinkTxt = gitLinkInp.value.trim();
     if(gitLinkTxt.startsWith("https://") || gitLinkTxt.startsWith("http://")){
       let data = await postMethod("coder", {"git": gitLinkTxt});
       if(data){
@@ -73,39 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const statData = getMethod("status");
-  if(statData){
-    if(statData["auto"]){
-        autoMode = true;
-    }
-    if(statData["wifi"]){
-        wifiOk = true;
-    }
-    if(statData["code"]){
-        codeMode = true;
-    }
-  }
-
-  if(autoMode){
-    autoModeBtn.className.replace("w3-green", "w3-orange");
-    autoModeBtn.textContent = "Stop Auto Mode";
-  }
-
-  if(codeMode){
-    codeModeBtn.classList.remove("w3-hide");
-    codeModeBtn.className.replace("w3-green", "w3-orange");
-    codeModeBtn.textContent = "Stop Code Mode";
-  }
-
-  if(wifiOk){
-    wifiSetupDiv.classList.add("w3-hide");
-    gitCodeDiv.classList.remove("w3-hide");
-    codeModeBtn.classList.remove("w3-hide");
-  }
-  else{
-    wifiSetupDiv.classList.remove("w3-hide");
-    gitCodeDiv.classList.add("w3-hide");
-  }
-
 
 });
 
@@ -114,6 +81,16 @@ function darkMode() {
 }
 
 async function getMethod(path) {
+  const autoModeBtn = document.getElementById("autoModeBtn");
+  const codeModeBtn = document.getElementById("codeModeBtn");
+  const gitLinkInp = document.getElementById("gitLinkInp");
+  const gitLinkBtn = document.getElementById("gitLinkBtn");
+  const wifiSetupDiv = document.getElementById("wifiSetupDiv");
+  const gitCodeDiv = document.getElementById("gitCodeDiv");
+  const ssidInp = document.getElementById("ssidInp");
+  const wifiPswdInp = document.getElementById("wifiPswdInp");
+  const wifiSetBtn = document.getElementById("wifiSetBtn");
+
   let url = `http://${ipHostName}/${path}`;
   try {
     const response = await fetch(url);
@@ -123,7 +100,39 @@ async function getMethod(path) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    const data = await response.json();
+    const statData = await response.json();
+    if(statData){
+      if(statData["auto"]){
+        autoMode = true;
+      }
+      if(statData["wifi"]){
+        wifiOk = true;
+      }
+      if(statData["code"]){
+        codeMode = true;
+      }
+    }
+    if(autoMode){
+      autoModeBtn.className.replace("w3-green", "w3-orange");
+      autoModeBtn.textContent = "Stop Auto Mode";
+    }
+  
+    if(codeMode){
+      codeModeBtn.classList.remove("w3-hide");
+      codeModeBtn.className.replace("w3-green", "w3-orange");
+      codeModeBtn.textContent = "Stop Code Mode";
+    }
+  
+    if(wifiOk){
+      wifiSetupDiv.classList.add("w3-hide");
+      gitCodeDiv.classList.remove("w3-hide");
+      codeModeBtn.classList.remove("w3-hide");
+    }
+    else{
+      wifiSetupDiv.classList.remove("w3-hide");
+      gitCodeDiv.classList.add("w3-hide");
+    }
+
     return data; // Returns the data (resolves the promise)
   }
   catch (error) {
