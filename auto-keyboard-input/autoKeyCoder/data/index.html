@@ -13,29 +13,40 @@
     <div class="w3-container w3-padding">
       <h3>Your automatic keyboard to bypass time tracking</h3>
 
-      <div class="w3-container w3-margin-bottom">
-        <button class="w3-btn w3-green w3-round-large w3-margin-top">Start Auto Mode</button>
+      <div id="controlDiv" class="w3-container">
+
+        <div class="w3-margin-bottom">
+          <button id="autoModeBtn" class="w3-btn w3-green w3-round-large w3-margin-top">Start Auto Mode</button>
+        </div>
+
+        <div id="wifiSetupDiv" class="w3-margin-top">
+          <h4>Enter your WiFi credentials to start coder mode</h6>
+          <form class="">
+            <label class=""><b>SSID (WiFi Name)</b></label>
+            <input id="ssidInp" class="w3-input w3-border w3-round" type="text" placeholder="ex: YourWiFiName">
+            <label class=""><b>Password</b></label>
+            <input id="wifiPswdInp" class="w3-input w3-border w3-round" type="text" placeholder="ex: wifi-password">
+            <button id="wifiSetBtn" type="button" class="w3-btn w3-teal w3-round-large w3-margin-top">Register</button>
+          </form>
+        </div>
+
+        <div id="gitCodeDiv" class="w3-margin-top">
+          <h4>Automatic Coder mode</h6>
+          <form class="">
+            <label class=""><b>GitHub Code Link (RAW)</b></label>
+            <input id="gitLinkInp" class="w3-input w3-border w3-round" type="text" placeholder="ex: https://raw.githubusercontent.com/daslearning-org/Org-Bypass/refs/heads/main/auto-keyboard-input/autoUsbKeyInpEsp32.ino">
+          
+            <button id="gitLinkBtn" type="button" class="w3-btn w3-teal w3-round-large w3-margin-top">Register</button>
+          </form>
+        </div>
+
+        <div class="w3-display-bottomright">
+          <button class="w3-button w3-black" onclick="darkMode()">Dark Mode</button>
+        </div>
+
       </div>
 
-      <div class="w3-container w3-margin-top">
-        <h4>Automatic Coder mode</h6>
-        <form class="">
-          <label class=""><b>GitHub Code Link (RAW)</b></label>
-          <input class="w3-input w3-border w3-round" type="text" placeholder="https://raw.githubusercontent.com/daslearning-org/Org-Bypass/refs/heads/main/auto-keyboard-input/autoUsbKeyInpEsp32.ino">
-        
-          <button class="w3-btn w3-teal w3-round-large w3-margin-top">Register</button>
-        </form>
-      </div>
-
-      <div class="w3-display-bottomright">
-        <button class="w3-button w3-black" onclick="darkMode()">Dark Mode</button>
-      </div>
-
-      <script>
-        function darkMode() {
-          document.body.classList.toggle("w3-black");
-        }
-      </script>
+      <script src="logic.js"></script>
 
     </div>
 
