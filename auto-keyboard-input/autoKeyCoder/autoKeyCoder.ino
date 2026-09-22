@@ -71,7 +71,7 @@ bool connectWiFi(const String &ssid, const String &password) {
     return false;
 }
 
-void postMethod(String urlPath) {
+void postMethod(const char* urlPath) {
     // Check that a request body was actually received
     if (!server.hasArg("plain")) {
         server.send(400, "application/json",
@@ -125,13 +125,14 @@ void postMethod(String urlPath) {
             return;
         }
         gitLink = (const char *)json["git"];
-        if(gitLink != "" or gitLink != "none"){
-            codeMode = true;
-        }
-        else{
+        if(gitLink == "" or gitLink == "none"){
             codeMode = false;
         }
-        Serial0.println("Coder mode " + codeMode ? "started" : "stopped");
+        else{
+            codeMode = true;
+        }
+        Serial0.print("Coder mode: ");
+        Serial0.println(codeMode ? "started" : "stopped");
         server.send(200, "application/json",
                     "{\"success\":true}");
     }
@@ -198,6 +199,7 @@ void readGitHubFile() {
 
     if (!http.begin(client, gitLink)) {
         Serial0.println("HTTP begin failed");
+        codeMode = false;
         return;
     }
 
@@ -206,17 +208,18 @@ void readGitHubFile() {
     if (httpCode != HTTP_CODE_OK) {
         Serial0.printf("HTTP error: %d\n", httpCode);
         http.end();
+        codeMode = false;
         return;
     }
 
     WiFiClient *stream = http.getStreamPtr();
 
     while ((http.connected() || stream->available()) && codeMode && codeStarted) {
-        while (stream->available() && codeStarted) {
+        while (stream->available() && codeStarted && codeMode) {
             char c = stream->read();
             //Serial0.write(c);
             Keyboard.print(c);
-            delay(400);
+            delay(350);
             server.handleClient();
         }
         delay(1);
@@ -296,16 +299,17 @@ void setup() {
 
 void loop() {
     if(codeMode && autoMode && wifiConnected) {
-        if(gitLink != "" or gitLink != "none"){
+        if(gitLink == "" or gitLink == "none"){
+            codeMode = false;
+        }
+        else{
             if(!codeStarted){
                 readGitHubFile();
             }
         }
-        else{
-            codeMode = false;
-        }
     }
     else if(autoMode) {
+        codeMode = false;
         if (millis() - timeCounter > 3000) { // every 3 seconds
             //Serial0.println("Not in coder mode");
             timeCounter = millis();
