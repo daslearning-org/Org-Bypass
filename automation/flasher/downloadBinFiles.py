@@ -43,6 +43,26 @@ files_to_download = {
     "esp32s3_auto_key.ino.bin": {
         "path": f"{flasher_path}/esp32/automatic-keyboard",
         "url": "https://github.com/daslearning-org/Org-Bypass/releases/download/v0.1.0/esp32s3_auto_key.ino.bin"
+    },
+    "esp32s3_coder_kb.ino.bootloader.bin": {
+        "path": f"{flasher_path}/esp32/coder-keyboard",
+        "url": "https://github.com/daslearning-org/Org-Bypass/releases/download/v0.1.0/esp32s3_coder_kb.ino.bootloader.bin"
+    },
+    "esp32s3_coder_kb.ino.partitions.bin": {
+        "path": f"{flasher_path}/esp32/coder-keyboard",
+        "url": "https://github.com/daslearning-org/Org-Bypass/releases/download/v0.1.0/esp32s3_coder_kb.ino.partitions.bin"
+    },
+    "esp32s3_coder_kb_boot_app0.bin": {
+        "path": f"{flasher_path}/esp32/coder-keyboard",
+        "url": "https://github.com/daslearning-org/Org-Bypass/releases/download/v0.1.0/esp32s3_coder_kb_boot_app0.bin"
+    },
+    "esp32s3_coder_kb.ino.bin": {
+        "path": f"{flasher_path}/esp32/coder-keyboard",
+        "url": "https://github.com/daslearning-org/Org-Bypass/releases/download/v0.1.0/esp32s3_coder_kb.ino.bin"
+    },
+    "esp32s3_coder_kb_static_web.bin": {
+        "path": f"{flasher_path}/esp32/coder-keyboard",
+        "url": "https://github.com/daslearning-org/Org-Bypass/releases/download/v0.1.0/esp32s3_coder_kb_static_web.bin"
     }
 }
 
