@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Smart Keyboard using ESP32</title>
+    <link rel="stylesheet" href="w3.css">
+  </head>
+
+  <body>
+
+    <div class="w3-container w3-padding">
+      <h3>Your automatic keyboard to bypass time tracking</h3>
+
+      <div id="controlDiv" class="w3-container">
+
+        <div class="w3-margin-bottom">
+          <button id="autoModeBtn" class="w3-btn w3-green w3-round-large w3-margin-top">Start Auto Mode</button>
+          <button id="codeModeBtn" class="w3-btn w3-orange w3-round-large w3-margin-top w3-hide">Stop Code Mode</button>
+        </div>
+
+        <div id="wifiSetupDiv" class="w3-margin-top">
+          <h4>Enter your WiFi credentials to start coder mode</h6>
+          <p>You need to reboot your ESP32, once wifi credentials are saved (unplug and plug)</p>
+          <form class="">
+            <label class=""><b>SSID (WiFi Name)</b></label>
+            <input id="ssidInp" class="w3-input w3-border w3-round" type="text" placeholder="ex: YourWiFiName">
+            <label class=""><b>Password</b></label>
+            <input id="wifiPswdInp" class="w3-input w3-border w3-round" type="password" placeholder="ex: wifi-password">
+            <button id="wifiSetBtn" type="button" class="w3-btn w3-teal w3-round-large w3-margin-top">Save Config</button>
+          </form>
+        </div>
+
+        <div id="gitCodeDiv" class="w3-margin-top">
+          <h4>Automatic Coder mode</h6>
+          <form class="">
+            <label class=""><b>GitHub Code Link (RAW)</b></label>
+            <input id="gitLinkInp" class="w3-input w3-border w3-round" type="text" placeholder="ex: https://raw.githubusercontent.com/daslearning-org/Org-Bypass/refs/heads/main/auto-keyboard-input/autoUsbKeyInpEsp32.ino">
+          
+            <button id="gitLinkBtn" type="button" class="w3-btn w3-teal w3-round-large w3-margin-top">Set Code</button>
+          </form>
+        </div>
+
+        <div class="w3-display-bottomright">
+          <button class="w3-button w3-black" onclick="darkMode()">Dark Mode</button>
+        </div>
+
+        <div id="popUp" class="w3-modal">
+          <div class="w3-modal-content w3-animate-top w3-card-4">
+            <header id="modalHead" class="w3-container w3-gray"> 
+              <span onclick="document.getElementById('popUp').style.display='none'" 
+              class="w3-button w3-display-topright">&times;</span>
+              <h2 id="modalHeaderTxt">Modal Header</h2>
+            </header>
+            <div class="w3-container">
+              <p id="modalTxt">Some text..</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <script src="logic.js"></script>
+
+    </div>
+
+  </body>
+
+</html>
