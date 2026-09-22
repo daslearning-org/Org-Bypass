@@ -20,13 +20,6 @@
 #define CONFIG_FILE "/config.json"
 
 /* Global vars / objects */
-enum PostData {
-    POST_START,
-    POST_STOP,
-    POST_CODER,
-    POST_CONFIG,
-    POST_UNKNOWN
-};
 bool codeMode = false;
 bool codeStarted = false;
 bool autoMode = false;
@@ -38,15 +31,6 @@ USBHIDKeyboard Keyboard;
 WebServer server(80);
 
 /* Functions */
-PostData getPostMode(String path) {
-    if (path == "start")  return POST_START;
-    if (path == "stop")   return POST_STOP;
-    if (path == "config") return POST_CODER;
-    if (path == "coder")  return POST_CONFIG;
-
-    return POST_UNKNOWN;
-}
-
 void startAP() {
     Serial0.println("Starting AP mode...");
 
@@ -141,8 +125,13 @@ void postMethod(String urlPath) {
             return;
         }
         gitLink = (const char *)json["git"];
-        codeMode = true;
-        Serial0.println("Coder mode started");
+        if(gitLink != "" or gitLink != "none"){
+            codeMode = true;
+        }
+        else{
+            codeMode = false;
+        }
+        Serial0.println("Coder mode " + codeMode ? "started" : "stopped");
         server.send(200, "application/json",
                     "{\"success\":true}");
     }
@@ -228,6 +217,7 @@ void readGitHubFile() {
             //Serial0.write(c);
             Keyboard.print(c);
             delay(400);
+            server.handleClient();
         }
         delay(1);
     }
@@ -305,7 +295,7 @@ void setup() {
 }
 
 void loop() {
-    if(codeMode && autoMode) {
+    if(codeMode && autoMode && wifiConnected) {
         if(gitLink != "" or gitLink != "none"){
             if(!codeStarted){
                 readGitHubFile();

@@ -16,7 +16,7 @@
 
         <div class="w3-margin-bottom">
           <button id="autoModeBtn" class="w3-btn w3-green w3-round-large w3-margin-top">Start Auto Mode</button>
-          <button id="codeModeBtn" class="w3-btn w3-green w3-round-large w3-margin-top w3-hide">Start Code Mode</button>
+          <button id="codeModeBtn" class="w3-btn w3-orange w3-round-large w3-margin-top w3-hide">Stop Code Mode</button>
         </div>
 
         <div id="wifiSetupDiv" class="w3-margin-top">
@@ -43,6 +43,19 @@
 
         <div class="w3-display-bottomright">
           <button class="w3-button w3-black" onclick="darkMode()">Dark Mode</button>
+        </div>
+
+        <div id="popUp" class="w3-modal">
+          <div class="w3-modal-content w3-animate-top w3-card-4">
+            <header id="modalHead" class="w3-container w3-gray"> 
+              <span onclick="document.getElementById('popUp').style.display='none'" 
+              class="w3-button w3-display-topright">&times;</span>
+              <h2 id="modalHeaderTxt">Modal Header</h2>
+            </header>
+            <div class="w3-container">
+              <p id="modalTxt">Some text..</p>
+            </div>
+          </div>
         </div>
 
       </div>

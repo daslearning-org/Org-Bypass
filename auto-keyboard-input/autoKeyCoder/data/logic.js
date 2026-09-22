@@ -3,16 +3,21 @@ let autoMode = false;
 let codeMode = false;
 let wifiOk = false;
 
+const autoModeBtn = document.getElementById("autoModeBtn");
+const codeModeBtn = document.getElementById("codeModeBtn");
+const gitLinkInp = document.getElementById("gitLinkInp");
+const gitLinkBtn = document.getElementById("gitLinkBtn");
+const wifiSetupDiv = document.getElementById("wifiSetupDiv");
+const gitCodeDiv = document.getElementById("gitCodeDiv");
+const ssidInp = document.getElementById("ssidInp");
+const wifiPswdInp = document.getElementById("wifiPswdInp");
+const wifiSetBtn = document.getElementById("wifiSetBtn");
+const popUp = document.getElementById("popUp");
+const modalHead = document.getElementById("modalHead");
+const modalHeaderTxt = document.getElementById("modalHeaderTxt");
+const modalTxt = document.getElementById("modalTxt");
+
 document.addEventListener('DOMContentLoaded', () => {
-  const autoModeBtn = document.getElementById("autoModeBtn");
-  const codeModeBtn = document.getElementById("codeModeBtn");
-  const gitLinkInp = document.getElementById("gitLinkInp");
-  const gitLinkBtn = document.getElementById("gitLinkBtn");
-  const wifiSetupDiv = document.getElementById("wifiSetupDiv");
-  const gitCodeDiv = document.getElementById("gitCodeDiv");
-  const ssidInp = document.getElementById("ssidInp");
-  const wifiPswdInp = document.getElementById("wifiPswdInp");
-  const wifiSetBtn = document.getElementById("wifiSetBtn");
 
   autoModeBtn.addEventListener("click", async function(event) {
     if(autoMode){
@@ -39,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if(data){
         codeModeBtn.classList.add("w3-hide");
         codeMode = false;
-        alert("Code method is stopped, you may start again by Set Code button.");
+        showPopUp("Done", "Code method is stopped, you may start again by Set Code button.");
       }
     }
   });
@@ -48,13 +53,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let ssidTxt = ssidInp.value.trim();
     let wifiPassTxt = wifiPswdInp.value.trim();
     if(ssidTxt.length<=2 || wifiPassTxt.length<=2){
-      alert("Carefully enter wifi name (ssid) & password");
+      showPopUp("Error", "Carefully enter wifi name (ssid) & password", "w3-red");
       return;
     }
     let data = await postMethod("config", {"ssid": ssidTxt, "password": wifiPassTxt});
     if(data){
       this.disabled = true;
-      alert("Wifi credentials saved, please reboot your esp32 (unplug & plug) ✅️")
+      showPopUp("Success", "Wifi credentials saved, please reboot your esp32 (unplug & plug) ✅️", "w3-green");
     }
   });
 
@@ -64,13 +69,12 @@ document.addEventListener('DOMContentLoaded', () => {
       let data = await postMethod("coder", {"git": gitLinkTxt});
       if(data){
         codeModeBtn.classList.remove("w3-hide");
-        codeModeBtn.classList.replace("w3-green", "w3-orange");
-        codeModeBtn.textContent = "Stop Code Mode";
-        alert("Code link sent to your ESP32 keybaord ✅️")
+        codeMode = true;
+        showPopUp("Success", "Code link sent to your ESP32 keybaord ✅️", "w3-green");
       }
     }
     else{
-      alert("You need to provide a proper link ❗");
+      showPopUp("Error", "You need to provide a proper link ❗", "w3-red");
     }
   });
 
@@ -82,16 +86,15 @@ function darkMode() {
   document.body.classList.toggle("w3-black");
 }
 
+function showPopUp(headTxt, bodyTxt, headClass="w3-gray") {
+  modalHeaderTxt.textContent = headTxt;
+  modalTxt.textContent = bodyTxt;
+  modalHead.classList.remove("w3-gray", "w3-red", "w3-green");
+  modalHead.classList.add(headClass);
+  popUp.style.display = "block";
+}
+
 async function getMethod(path) {
-  const autoModeBtn = document.getElementById("autoModeBtn");
-  const codeModeBtn = document.getElementById("codeModeBtn");
-  const gitLinkInp = document.getElementById("gitLinkInp");
-  const gitLinkBtn = document.getElementById("gitLinkBtn");
-  const wifiSetupDiv = document.getElementById("wifiSetupDiv");
-  const gitCodeDiv = document.getElementById("gitCodeDiv");
-  const ssidInp = document.getElementById("ssidInp");
-  const wifiPswdInp = document.getElementById("wifiPswdInp");
-  const wifiSetBtn = document.getElementById("wifiSetBtn");
 
   let url = `http://${ipHostName}/${path}`;
   try {
