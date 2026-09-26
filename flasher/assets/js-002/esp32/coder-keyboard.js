@@ -125,6 +125,7 @@ flashMultiBtn.onclick = async () => {
       { data: app,        address: 0x10000 },
       { data: staticBin,  address: 0x290000 }
     ];
+    let arrayLen = fileArray.length;
     statusText.innerText = "Status: Writing to flash...";
     await esploader.writeFlash({
       fileArray: fileArray,
@@ -135,14 +136,14 @@ flashMultiBtn.onclick = async () => {
       compress: true,
       reportProgress: (fileIndex, written, total) => {
         const percent = Math.round((written / total) * 100);
-        statusText.innerText = `Status: Flashing file ${fileIndex + 1}/4 (${percent}%)`;
+        statusText.innerText = `Status: Flashing file ${fileIndex + 1}/${arrayLen} (${percent}%)`;
       }
     });
     statusText.innerText = "Status: Flashing complete! Resetting board...";
     log("Done! Rebooting chip into user firmware...");
-    // 1. Trigger a hard reset using esptool-js's built-in reset method
-    await esploader.hardReset();
-    // 2. Release the USB serial port locks so the browser or other tools can read serial
+    // 1. Trigger a hard reset
+    await esploader.after("hard_reset");
+    // 2. Release the USB serial port
     await transport.disconnect();
     log("Device reset successfully!");
   }
@@ -178,9 +179,9 @@ flashMergedBtn.onclick = async () => {
     });
     statusText.innerText = "Status: Flash complete! Resetting board...";
     log("Done! Rebooting chip into user firmware...");
-    // 1. Trigger a hard reset using esptool-js's built-in reset method
-    await esploader.hardReset();
-    // 2. Release the USB serial port locks so the browser or other tools can read serial
+    // 1. Trigger a hard reset
+    await esploader.after("hard_reset");
+    // 2. Release the USB serial port
     await transport.disconnect();
     log("Device reset successfully!");
   }
